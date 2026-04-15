@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 import random
 import json
 
-# --- 📝 데이터 세팅 ---
+# --- 📝 데이터 세팅 (전체 데이터 동일) ---
 RAW_DATA = """
 데드크로스: 주식시장에서 단기 이동평균선이 장기 이동평균선을 아래로 뚫고 내려가는 현상
 리세션: 경기 하강 과정에서 발생하는 일시적인 경기 후퇴
@@ -17,7 +17,7 @@ HBM4E: 삼성전자가 실물 칩을 최초로 공개한 7세대 고대역폭 �
 팩맨 방어: 적대적 인수 위기에 처한 타깃 기업이 역으로 공격 기업의 주식을 사들여 경영권을 위협하는 공격적인 방어 전략
 터보퀀트: '벡터 검색 엔진'에서 발생하는 메모리 병목 현상을 해결해 AI 효율성을 획기적으로 개선하는 데이터 압축 알고리즘 
 타코(TACO): 시장 충격을 유발하는 강경 정책을 내놓았다가 금융시장 압박이 커지면 물러서는 트럼프 대통령의 반복된 정책 패턴 
-나초(NACHO): 호르무즈 해협 개방에 대한 실질적 변화가 없다는 뜻의 줄임말
+나초(NACHO): 호르무즈 해협 개방에 대한 실질적 변화가 없다
 제로 클릭: 검색 없이 인공지능에 물어보면 바로 답을 얻는 환경
 부동산 감독원: 집값 띄우기 및 탈세 등 부동산 시장 내 불법 행위를 전문적으로 감시하고 이를 수사하는 권한을 지닌 감독기구
 오픈클로: 인공지능이 사용자의 컴퓨터 환경에 직접 접근해 실제 행동을 수행하도록 설계된 이른바 'AI 에이전트' 기술
@@ -47,7 +47,7 @@ VASP: 가상자산 사업자
 튜나(TUNA): 도널드 트럼프 미국 태동령은 보통 발표를 뒤집는다는 뜻의 줄임말
 납치광고: 이용자가 원래 보려던 콘텐츠와 무관하게 광고 페이지나 특정 플랫폼으로 강제 이동시키고, 쉽게 벗어나지 못하도록 설계된 온라인 광고 행태
 아인슈텔룽 효과: 과거의 성공적인 해결 방식에 익숙해져서 더 나은 새로운 해결책을 찾지 못하는 현상
-나프타: 플라스틱 등 석유화학의 원료가 되는 조제 휘발유로, 내연기관이나 도시가스의 연료로 사용됨
+나프타: 플라스틱 등 석유화학의 원료가 되는 조제(粗製) 휘발유로, 내연기관이나 도시가스의 연료로 사용됨
 서킷 브레이커: 주식시장에서 주가지수가 일정 수준 이상 급락할 경우 공황 매매를 방지하고 투자자에게 냉정한 판단 시간을 제공하기 위해 일정 시간 동안 모든 매매 거래를 일시적으로 중단하는 시장 안정 장치
 사이드카: 선물시장의 급등락이 현물시장에 과도하게 파급되는 것을 막기 위해 선물 가격이 기준가 대비 ±5% 이상인 상황이 1분간 지속하는 경우 발동되는 안전 장치
 MASGA: 2025년 7월 한국 정부가 미국과의 통상 협상을 타결하는 데 결정적인 역할을 한 전략적 구상
@@ -56,7 +56,7 @@ AI 버블론: AI에 대한 기대가 과도해 인공지능 관련 주식이 과
 노벨상: 매년 10월에 수상하며 생리의학, 물리학, 화학, 문학, 평화,경제학 분야에 걸쳐 수상함
 ICE(United States Immigration and Customs Enforcement): 미국 이민세관집행국
 NATO: 북대서양 조약 기구
-조세이 탄광: 야마구치현에 있는 해저탄광 (일제 강점기 당시 수몰 사고로 조선인 136명이 사망)
+조세이 탄광: 야마구치현에 있는 해저탄광, 일제 강점기 당시 수몰 사고로 조선인 136명이 사망
 패트리어트 미사일: 지대공, 전술탄도미사일 요격 시스템
 5극 3특: 수도권 일득 체제를 완화하고 국가균형성장을 추진하기 위해 대한민국을 5개 초광역권과 3개의 특별자치권으로 나눠 성장엔진을 육성하는 정책 
 잔디깎기 전략: 작은 규모의 충돌이나 도발에는 지속적으로 대응하는 대신 큰 규모의 전쟁은 피하며 안보를 유지하는 전략
@@ -70,18 +70,7 @@ SMR: 소형 모듈 원전으로 기존 대비 작은 용량과 모듈식 설계�
 HBM: 고대역폭 메모리
 """
 
-EXTERNAL_DISTRACTORS = [
-    "유니콘 기업", "데카콘 기업", "그레이 스완", "화이트 스완", "그린플레이션", 
-    "스테이케이션", "긱 워커", "플랫폼 노동", "ESG 경영", "RE100", 
-    "탄소국경세", "오픈 이노베이션", "데이터 3법", "마이데이터", "메타버스", 
-    "중대재해처벌법", "가상화폐", "스테이블 코인", "CBDC", "NFT", 
-    "브레드플레이션", "슈링크플레이션", "스킴플레이션", "밀크플레이션", "런치플레이션", 
-    "공매도", "서킷브레이커", "사이드카", "윈도우 드레싱", "어닝 쇼크", 
-    "기업공개(IPO)", "스팩(SPAC)", "엔젤 투자", "크라우드 펀딩", "벤처 캐피털", 
-    "기준금리", "빅스텝", "자이언트스텝", "베이비스텝", "양적긴축(QT)", 
-    "테이퍼 탠트럼", "역모기지론", "안전자산", "위험자산", "기축통화", 
-    "환율 조작국", "스와프 포인트", "통화 스와프", "외환보유고", "디폴트"
-]
+EXTERNAL_DISTRACTORS = ["유니콘 기업", "데카콘 기업", "그레이 스완", "화이트 스완", "그린플레이션", "스테이케이션", "긱 워커", "플랫폼 노동", "ESG 경영", "RE100", "탄소국경세", "오픈 이노베이션", "데이터 3법", "마이데이터", "메타버스", "중대재해처벌법", "가상화폐", "스테이블 코인", "CBDC", "NFT", "브레드플레이션", "슈링크플레이션", "스킴플레이션", "밀크플레이션", "런치플레이션", "공매도", "서킷브레이커", "사이드카", "윈도우 드레싱", "어닝 쇼크", "기업공개(IPO)", "스팩(SPAC)", "엔젤 투자", "크라우드 펀딩", "벤처 캐피털", "기준금리", "빅스텝", "자이언트스텝", "베이비스텝", "양적긴축(QT)", "테이퍼 탠트럼", "역모기지론", "안전자산", "위험자산", "기축통화", "환율 조작국", "스와프 포인트", "통화 스와프", "외환보유고", "디폴트"]
 
 def parse_data(raw_text):
     data = []
@@ -93,118 +82,91 @@ def parse_data(raw_text):
 
 QUIZ_DATA = parse_data(RAW_DATA)
 
-st.set_page_config(page_title="시사상식 대비", layout="centered")
+st.set_page_config(page_title="시사상식", page_icon="🎯", layout="centered")
 
-# --- 🎨 전역 스타일 ---
+# --- 🎨 컴팩트 스타일 (여백 및 크기 최적화) ---
 st.markdown("""
     <style>
-    .title-separator { border-top: 2px solid #333333; margin-top: 5px; margin-bottom: 25px; width: 100%; }
-    .stTabs [data-baseweb="tab-list"] { gap: 10px; border-bottom: none !important; }
+    /* 전체 여백 줄이기 */
+    .main .block-container { padding-top: 1rem; padding-bottom: 1rem; max-width: 95%; }
+    .title-separator { border-top: 1px solid #eee; margin-top: 5px; margin-bottom: 15px; }
+    h1 { font-size: 1.5rem !important; margin-bottom: 10px; }
+    
+    /* 탭 메뉴 슬림화 */
+    .stTabs [data-baseweb="tab-list"] { gap: 5px; }
     .stTabs [data-baseweb="tab"] {
-        height: 45px; background-color: transparent !important; border: none !important;
-        border-radius: 25px !important; padding: 0px 18px !important; color: #aaaaaa !important;
+        height: 35px; font-size: 14px !important;
+        border-radius: 20px !important; padding: 0px 15px !important;
     }
-    .stTabs [aria-selected="true"] { background-color: #a2d2ff !important; color: white !important; }
-    .stTabs [data-baseweb="tab-border"] { display: none !important; }
-
-    /* 단답형 - 다음 문제 버튼 위치 수정 (입력란 아래 중앙) */
-    .next-btn-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 25px;
-        width: 100%;
-    }
+    
+    /* 단답형/객관식 폰트 조절 */
+    .stMarkdown p, .stRadio label { font-size: 14.5px !important; }
+    div[data-testid="stForm"] { padding: 10px; border-radius: 10px; }
+    
+    .next-btn-container { display: flex; justify-content: center; margin-top: 15px; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("시사상식 대비")
 st.markdown('<div class="title-separator"></div>', unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["암기 모드", "단답형", "객관식"])
+tab1, tab2, tab3 = st.tabs(["암기", "단답", "객관"])
 
-# --- 탭 1: 암기 모드 ---
+# --- 탭 1: 암기 모드 (컴팩트 검색창) ---
 with tab1:
     json_data = json.dumps(QUIZ_DATA, ensure_ascii=False)
-    
-    # 검색창 우측 잘림 방지를 위한 CSS 보정 (width: calc(100% - 2px) 및 box-sizing)
     search_html = f"""
-    <div id="search-container" style="font-family: 'Apple SD Gothic Neo', sans-serif; width: 100%; box-sizing: border-box;">
-        <input type="text" id="search-input" placeholder="찾으시는 단어를 입력하세요" 
-            style="width: calc(100% - 2px); padding: 12px 20px; border-radius: 25px; border: 1px solid #eee; 
-            outline: none; font-size: 16px; background-color: #f9f9f9; margin-bottom: 20px; box-sizing: border-box;">
-        <div id="results-container" style="width: 100%;"></div>
+    <div id="search-container" style="font-family: sans-serif; width: 100%; box-sizing: border-box;">
+        <input type="text" id="search-input" placeholder="단어 검색" 
+            style="width: 100%; padding: 10px 15px; border-radius: 20px; border: 1px solid #eee; 
+            outline: none; font-size: 14px; background-color: #f9f9f9; margin-bottom: 15px; box-sizing: border-box;">
+        <div id="results-container"></div>
     </div>
-
     <script>
         const data = {json_data};
         const input = document.getElementById('search-input');
         const container = document.getElementById('results-container');
-
         function displayResults(filter = "") {{
             container.innerHTML = "";
             const filtered = data.filter(item => item.word.toLowerCase().includes(filter.toLowerCase()));
-            
             filtered.forEach(item => {{
                 const details = document.createElement('details');
-                details.style.marginBottom = "10px";
-                details.style.border = "1px solid #f2f2f2";
-                details.style.borderRadius = "10px";
-                details.style.padding = "12px 15px";
-                details.style.boxSizing = "border-box";
-                
+                details.style.marginBottom = "8px";
+                details.style.border = "1px solid #f9f9f9";
+                details.style.borderRadius = "8px";
+                details.style.padding = "10px";
                 const summary = document.createElement('summary');
-                summary.innerHTML = "<span style='font-size: 10px; vertical-align: middle; margin-right: 8px;'>●</span>" + item.word;
-                summary.style.fontWeight = "normal"; 
+                summary.innerHTML = "<span style='font-size: 8px; margin-right: 8px;'>●</span>" + item.word;
+                summary.style.fontSize = "14px";
                 summary.style.cursor = "pointer";
                 summary.style.listStyle = "none";
-                summary.style.outline = "none";
-                
                 const p = document.createElement('p');
                 p.innerText = item.definition;
-                p.style.marginTop = "15px"; 
-                p.style.color = "#555";
-                p.style.fontSize = "14.5px";
-                p.style.lineHeight = "1.6";
-
-                details.appendChild(summary);
-                details.appendChild(p);
-                container.appendChild(details);
+                p.style.marginTop = "10px"; p.style.color = "#666"; p.style.fontSize = "13px"; p.style.lineHeight = "1.5";
+                details.appendChild(summary); details.appendChild(p); container.appendChild(details);
             }});
         }}
-
         displayResults();
-        input.addEventListener('input', (e) => {{
-            displayResults(e.target.value);
-        }});
+        input.addEventListener('input', (e) => displayResults(e.target.value));
     </script>
     """
-    components.html(search_html, height=800, scrolling=True)
+    components.html(search_html, height=550, scrolling=True)
 
 # --- 탭 2: 단답형 ---
 with tab2:
-    if 'current_q' not in st.session_state:
-        st.session_state.current_q = random.choice(QUIZ_DATA)
-    if 'input_key' not in st.session_state:
-        st.session_state.input_key = 0
-
+    if 'current_q' not in st.session_state: st.session_state.current_q = random.choice(QUIZ_DATA)
+    if 'input_key' not in st.session_state: st.session_state.input_key = 0
     q = st.session_state.current_q
-    st.markdown(f"<div style='margin-bottom:20px; font-size:1.1rem;'>Q. {q['definition']}</div>", unsafe_allow_html=True)
-    
-    with st.form(key=f"short_form_{st.session_state.input_key}", clear_on_submit=False):
-        col_input, col_check = st.columns([3, 1])
-        with col_input:
-            ans = st.text_input("정답", placeholder="단어 입력", label_visibility="collapsed")
-        with col_check:
-            submit = st.form_submit_button("확인")
-        
+    st.markdown(f"**Q.** {q['definition']}")
+    with st.form(key=f"short_form_{st.session_state.input_key}"):
+        col_input, col_check = st.columns([2, 1])
+        with col_input: ans = st.text_input("정답", placeholder="입력", label_visibility="collapsed")
+        with col_check: submit = st.form_submit_button("확인")
         if submit:
-            if ans.replace(" ", "").lower() == q['word'].replace(" ", "").lower():
-                st.success("정답입니다.")
-            elif ans != "":
-                st.error(f"오답. 정답은 **{q['word']}** 입니다.")
-
+            if ans.replace(" ", "").lower() == q['word'].replace(" ", "").lower(): st.success("정답")
+            elif ans != "": st.error(f"정답: {q['word']}")
     st.markdown('<div class="next-btn-container">', unsafe_allow_html=True)
-    if st.button("다음 문제", key="next_btn"):
+    if st.button("다음 문제"):
         st.session_state.current_q = random.choice(QUIZ_DATA)
         st.session_state.input_key += 1
         st.rerun()
@@ -213,31 +175,24 @@ with tab2:
 # --- 탭 3: 객관식 ---
 with tab3:
     if 'quiz_set' not in st.session_state:
-        selected = random.sample(QUIZ_DATA, min(15, len(QUIZ_DATA)))
+        selected = random.sample(QUIZ_DATA, min(10, len(QUIZ_DATA))) # 문제를 10개로 줄여 스크롤 방지
         st.session_state.quiz_set = []
         for q_item in selected:
             internal_words = [d['word'] for d in QUIZ_DATA if d['word'] != q_item['word']]
-            full_distractor_pool = list(set(internal_words + EXTERNAL_DISTRACTORS))
-            distractors = random.sample(full_distractor_pool, 3)
-            opts = distractors + [q_item['word']]
+            full_pool = list(set(internal_words + EXTERNAL_DISTRACTORS))
+            opts = random.sample(full_pool, 3) + [q_item['word']]
             random.shuffle(opts)
             st.session_state.quiz_set.append({"q": q_item, "opts": opts})
         st.session_state.user_ans = [None] * len(selected)
         st.session_state.done = False
-
     for i, item in enumerate(st.session_state.quiz_set):
-        st.markdown(f"**{i+1}. {item['q']['definition']}**")
+        st.markdown(f"**{i+1}.** {item['q']['definition']}")
         st.session_state.user_ans[i] = st.radio(f"c_{i}", item['opts'], index=None if st.session_state.user_ans[i] is None else item['opts'].index(st.session_state.user_ans[i]), key=f"r_{i}", label_visibility="collapsed", disabled=st.session_state.done)
         if st.session_state.done:
             if st.session_state.user_ans[i] == item['q']['word']: st.success(f"정답: {item['q']['word']}")
-            else: st.error(f"오답. (정답: {item['q']['word']})")
+            else: st.error(f"정답: {item['q']['word']}")
         st.write("---")
-
     if not st.session_state.done:
-        if st.button("최종 제출 및 채점"):
-            st.session_state.done = True
-            st.rerun()
+        if st.button("채점하기"): st.session_state.done = True; st.rerun()
     else:
-        if st.button("새로운 문제 풀기"):
-            del st.session_state.quiz_set
-            st.rerun()
+        if st.button("새 문제"): del st.session_state.quiz_set; st.rerun()
