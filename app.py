@@ -175,24 +175,31 @@ with tab2:
 # --- 탭 3: 객관식 ---
 with tab3:
     if 'quiz_set' not in st.session_state:
-        selected = random.sample(QUIZ_DATA, min(10, len(QUIZ_DATA))) # 문제를 10개로 줄여 스크롤 방지
+        selected = random.sample(QUIZ_DATA, min(15, len(QUIZ_DATA)))
         st.session_state.quiz_set = []
         for q_item in selected:
             internal_words = [d['word'] for d in QUIZ_DATA if d['word'] != q_item['word']]
-            full_pool = list(set(internal_words + EXTERNAL_DISTRACTORS))
-            opts = random.sample(full_pool, 3) + [q_item['word']]
+            full_distractor_pool = list(set(internal_words + EXTERNAL_DISTRACTORS))
+            distractors = random.sample(full_distractor_pool, 3)
+            opts = distractors + [q_item['word']]
             random.shuffle(opts)
             st.session_state.quiz_set.append({"q": q_item, "opts": opts})
         st.session_state.user_ans = [None] * len(selected)
         st.session_state.done = False
+
     for i, item in enumerate(st.session_state.quiz_set):
-        st.markdown(f"**{i+1}.** {item['q']['definition']}")
+        st.markdown(f"**{i+1}. {item['q']['definition']}**")
         st.session_state.user_ans[i] = st.radio(f"c_{i}", item['opts'], index=None if st.session_state.user_ans[i] is None else item['opts'].index(st.session_state.user_ans[i]), key=f"r_{i}", label_visibility="collapsed", disabled=st.session_state.done)
         if st.session_state.done:
             if st.session_state.user_ans[i] == item['q']['word']: st.success(f"정답: {item['q']['word']}")
-            else: st.error(f"정답: {item['q']['word']}")
+            else: st.error(f"오답. (정답: {item['q']['word']})")
         st.write("---")
+
     if not st.session_state.done:
-        if st.button("채점하기"): st.session_state.done = True; st.rerun()
+        if st.button("최종 제출 및 채점"):
+            st.session_state.done = True
+            st.rerun()
     else:
-        if st.button("새 문제"): del st.session_state.quiz_set; st.rerun()
+        if st.button("새로운 문제 풀기"):
+            del st.session_state.quiz_set
+            st.rerun()
