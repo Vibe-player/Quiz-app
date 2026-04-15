@@ -70,7 +70,7 @@ SMR: 소형 모듈 원전으로 기존 대비 작은 용량과 모듈식 설계�
 HBM: 고대역폭 메모리
 """
 
-EXTERNAL_DISTRACTORS = ["ESG 경영", "RE100", "가상화폐", "NFT", "공매도", "기준금리", "환율", "데이터 3법", "메타버스", "탄소세"]
+EXTERNAL_DISTRACTORS = ["ESG 경영", "공매도", "기준금리", "환율", "메타버스", "가상화폐"]
 
 def parse_data(raw_text):
     data = []
@@ -82,116 +82,152 @@ def parse_data(raw_text):
 
 QUIZ_DATA = parse_data(RAW_DATA)
 
-st.set_page_config(page_title="시사상식", page_icon="🎯", layout="centered")
+st.set_page_config(page_title="시사상식 대비", page_icon="🎯", layout="centered")
 
-# --- 🎨 화면 최적화 스타일 (스크롤 제거) ---
+# --- 🎨 디자인 복구 및 스크롤 방지 최적화 ---
 st.markdown("""
     <style>
-    /* 상단 메뉴 및 불필요한 여백 제거 */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* 전체 여백 초기화 및 가로 스크롤 방지 */
+    html, body { overflow-x: hidden; width: 100vw; }
+    .main .block-container { padding: 10px 15px !important; max-width: 100% !important; }
     
-    /* 전체 여백 타이트하게 조절 */
-    .main .block-container {
-        padding: 10px 15px !important;
-        max-width: 100% !important;
-    }
-
-    /* 탭 디자인 슬림화 */
-    .stTabs [data-baseweb="tab-list"] { gap: 5px; }
+    .title-separator { border-top: 2px solid #333333; margin-top: 5px; margin-bottom: 20px; width: 100%; }
+    
+    /* 탭 스타일 복구 (하늘색 포인트) */
+    .stTabs [data-baseweb="tab-list"] { gap: 8px; border-bottom: none !important; }
     .stTabs [data-baseweb="tab"] {
-        height: 32px; font-size: 13px !important;
-        padding: 0px 12px !important;
+        height: 40px; background-color: transparent !important; border: none !important;
+        border-radius: 20px !important; padding: 0px 16px !important; color: #aaaaaa !important;
     }
-    
-    /* 텍스트 크기 미세 조정 */
-    h1 { font-size: 1.3rem !important; margin-bottom: 5px !important; }
-    .stMarkdown p { font-size: 14px !important; margin-bottom: 5px !important; }
-    
-    /* 가로 스크롤 방지 */
-    html, body { overflow-x: hidden; }
+    .stTabs [aria-selected="true"] { background-color: #a2d2ff !important; color: white !important; }
+    .stTabs [data-baseweb="tab-border"] { display: none !important; }
+
+    /* 버튼 및 폼 레이아웃 */
+    .next-btn-container { display: flex; justify-content: center; margin-top: 20px; width: 100%; }
+    div[data-testid="stForm"] { border: 1px solid #f0f0f0; border-radius: 15px; padding: 15px; }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("시사상식 대비")
+st.markdown('<div class="title-separator"></div>', unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["암기", "단답", "객관"])
+tab1, tab2, tab3 = st.tabs(["암기 모드", "단답형", "객관식"])
 
-# --- 탭 1: 암기 (컴포넌트 높이 최적화) ---
+# --- 탭 1: 암기 모드 (검색창 우측 마감 수정) ---
 with tab1:
     json_data = json.dumps(QUIZ_DATA, ensure_ascii=False)
+    
+    # width를 100%로 두고 box-sizing을 적용하여 테두리가 잘리지 않게 함
     search_html = f"""
-    <div id="search-container" style="font-family: sans-serif; width: 100%;">
-        <input type="text" id="search-input" placeholder="단어 검색" 
-            style="width: 100%; padding: 8px 12px; border-radius: 15px; border: 1px solid #ddd; 
-            font-size: 14px; margin-bottom: 10px; box-sizing: border-box;">
-        <div id="results-container" style="height: calc(100vh - 180px); overflow-y: auto;"></div>
+    <div id="search-container" style="font-family: 'Apple SD Gothic Neo', sans-serif; width: 100%; box-sizing: border-box; overflow: hidden;">
+        <input type="text" id="search-input" placeholder="찾으시는 단어를 입력하세요" 
+            style="width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid #eee; 
+            outline: none; font-size: 16px; background-color: #f9f9f9; margin-bottom: 20px; box-sizing: border-box; display: block;">
+        <div id="results-container" style="width: 100%; box-sizing: border-box;"></div>
     </div>
+
     <script>
         const data = {json_data};
         const input = document.getElementById('search-input');
         const container = document.getElementById('results-container');
+
         function displayResults(filter = "") {{
             container.innerHTML = "";
             const filtered = data.filter(item => item.word.toLowerCase().includes(filter.toLowerCase()));
+            
             filtered.forEach(item => {{
-                const div = document.createElement('div');
-                div.style.padding = "10px";
-                div.style.borderBottom = "1px solid #f0f0f0";
-                div.innerHTML = `<details style="cursor:pointer;"><summary style="font-size:14px; font-weight:500;">● ${{item.word}}</summary>
-                                 <p style="font-size:13px; color:#666; margin-top:5px; line-height:1.4;">${{item.definition}}</p></details>`;
-                container.appendChild(div);
+                const details = document.createElement('details');
+                details.style.marginBottom = "10px";
+                details.style.border = "1px solid #f2f2f2";
+                details.style.borderRadius = "10px";
+                details.style.padding = "12px 15px";
+                details.style.boxSizing = "border-box";
+                
+                const summary = document.createElement('summary');
+                summary.innerHTML = "<span style='font-size: 10px; vertical-align: middle; margin-right: 8px;'>●</span>" + item.word;
+                summary.style.fontWeight = "normal"; 
+                summary.style.cursor = "pointer";
+                summary.style.listStyle = "none";
+                summary.style.outline = "none";
+                
+                const p = document.createElement('p');
+                p.innerText = item.definition;
+                p.style.marginTop = "15px"; 
+                p.style.color = "#555";
+                p.style.fontSize = "14.5px";
+                p.style.lineHeight = "1.6";
+
+                details.appendChild(summary);
+                details.appendChild(p);
+                container.appendChild(details);
             }});
         }}
+
         displayResults();
-        input.addEventListener('input', (e) => displayResults(e.target.value));
+        input.addEventListener('input', (e) => {{
+            displayResults(e.target.value);
+        }});
     </script>
     """
-    # height를 600으로 고정하여 부모 컨테이너 내에서만 스크롤되도록 설정
-    components.html(search_html, height=600)
+    # height를 적절히 높여 내부 스크롤이 원활하게 함
+    components.html(search_html, height=750, scrolling=False)
 
 # --- 탭 2: 단답형 ---
 with tab2:
-    if 'current_q' not in st.session_state: st.session_state.current_q = random.choice(QUIZ_DATA)
-    if 'input_key' not in st.session_state: st.session_state.input_key = 0
-    
+    if 'current_q' not in st.session_state:
+        st.session_state.current_q = random.choice(QUIZ_DATA)
+    if 'input_key' not in st.session_state:
+        st.session_state.input_key = 0
+
     q = st.session_state.current_q
-    st.markdown(f"**Q.** {q['definition']}")
+    st.markdown(f"<div style='margin-bottom:20px; font-size:1.0rem; line-height:1.5;'><b>Q.</b> {q['definition']}</div>", unsafe_allow_html=True)
     
-    with st.form(key=f"short_form_{st.session_state.input_key}"):
-        ans = st.text_input("정답 입력", placeholder="단어를 입력하세요", label_visibility="collapsed")
-        submit = st.form_submit_button("확인")
+    with st.form(key=f"short_form_{st.session_state.input_key}", clear_on_submit=False):
+        col_input, col_check = st.columns([3, 1])
+        with col_input:
+            ans = st.text_input("정답", placeholder="단어 입력", label_visibility="collapsed")
+        with col_check:
+            submit = st.form_submit_button("확인")
+        
         if submit:
-            if ans.replace(" ", "").lower() == q['word'].replace(" ", "").lower(): st.success("정답!")
-            else: st.error(f"오답! 정답: {q['word']}")
-            
+            if ans.replace(" ", "").lower() == q['word'].replace(" ", "").lower():
+                st.success("정답입니다!")
+            elif ans != "":
+                st.error(f"오답. 정답: {q['word']}")
+
+    st.markdown('<div class="next-btn-container">', unsafe_allow_html=True)
     if st.button("다음 문제"):
         st.session_state.current_q = random.choice(QUIZ_DATA)
         st.session_state.input_key += 1
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 탭 3: 객관식 (문제 수 축소) ---
+# --- 탭 3: 객관식 ---
 with tab3:
     if 'quiz_set' not in st.session_state:
-        selected = random.sample(QUIZ_DATA, min(5, len(QUIZ_DATA))) # 한 화면에 보이도록 5문제로 축소
+        selected = random.sample(QUIZ_DATA, min(10, len(QUIZ_DATA)))
         st.session_state.quiz_set = []
         for q_item in selected:
-            opts = random.sample([d['word'] for d in QUIZ_DATA if d['word'] != q_item['word']] + EXTERNAL_DISTRACTORS, 3) + [q_item['word']]
+            distractors = random.sample([d['word'] for d in QUIZ_DATA if d['word'] != q_item['word']] + EXTERNAL_DISTRACTORS, 3)
+            opts = distractors + [q_item['word']]
             random.shuffle(opts)
             st.session_state.quiz_set.append({"q": q_item, "opts": opts})
-        st.session_state.user_ans = [None] * 5
+        st.session_state.user_ans = [None] * len(selected)
         st.session_state.done = False
 
     for i, item in enumerate(st.session_state.quiz_set):
         st.markdown(f"**{i+1}.** {item['q']['definition']}")
-        st.session_state.user_ans[i] = st.radio(f"q_{i}", item['opts'], key=f"r_{i}", label_visibility="collapsed", disabled=st.session_state.done)
+        st.session_state.user_ans[i] = st.radio(f"q_{i}", item['opts'], index=None if st.session_state.user_ans[i] is None else item['opts'].index(st.session_state.user_ans[i]), key=f"r_{i}", label_visibility="collapsed", disabled=st.session_state.done)
         if st.session_state.done:
             if st.session_state.user_ans[i] == item['q']['word']: st.success("정답")
             else: st.error(f"정답: {item['q']['word']}")
         st.write("---")
 
     if not st.session_state.done:
-        if st.button("제출"): st.session_state.done = True; st.rerun()
+        if st.button("최종 제출 및 채점"):
+            st.session_state.done = True
+            st.rerun()
     else:
-        if st.button("새 퀴즈"): del st.session_state.quiz_set; st.rerun()
+        if st.button("새로운 문제 풀기"):
+            del st.session_state.quiz_set
+            st.rerun()
